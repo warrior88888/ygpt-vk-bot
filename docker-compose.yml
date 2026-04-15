@@ -1,6 +1,6 @@
 services:
   bot:
-    build: .
+    image: warrior88888/ygpt-vk-bot
     container_name: vk_bot
     networks:
       - bot_internal

@@ -82,6 +82,8 @@ ignore = [
     "RUF012",
 ]
 
+per-file-ignores = { "bot/lexicon/*.py" = ["E501"], "bot/services/yandexgpt/prompts.py" = ["E501"] }
+
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = []
