@@ -1,0 +1,45 @@
+services:
+  bot:
+    build: .
+    container_name: vk_bot
+    networks:
+      - bot_internal
+    restart: always
+    env_file:
+      - .env
+    environment:
+      BOT__REDIS__HOST: "redis"
+    depends_on:
+      redis:
+        condition: service_healthy
+  
+  redis:
+    image: redis:7.4.8-alpine3.21
+    container_name: redis_container
+    networks:
+      - bot_internal
+    env_file:
+      - .env
+    environment:
+      - REDIS_PASSWORD=${BOT__REDIS__PASSWORD}
+      - REDIS_PORT=${BOT__REDIS__PORT}
+    command: >
+      redis-server 
+        --requirepass ${BOT__REDIS__PASSWORD} 
+        --port ${BOT__REDIS__PORT}
+        --maxmemory 256mb
+        --maxmemory-policy volatile-ttl
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli -p $$REDIS_PORT -a $$REDIS_PASSWORD ping | grep PONG" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  bot_internal:
+    driver: bridge
